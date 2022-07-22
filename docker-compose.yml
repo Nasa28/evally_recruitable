@@ -1,26 +1,33 @@
-version: '3'
+version: '3.8'
 services:
   recruitable_db:
     container_name: evally_recruitable_db
     image: postgres:10.6-alpine
     volumes:
       - postgres:/var/lib/postgresql/data
-
+    # env_file:
+    #   - .env
   recruitable_app:
     environment:
       - RAILS_ENV=development
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+    image: evally_recruitable_app:latest
     container_name: evally_recruitable_app
     command: bin/rails s -p 3030 -b '0.0.0.0'
-    user: ${CURRENT_USER}
+    init: true
+    # user: ${CURRENT_USER}
     volumes:
       - .:/app
       - ./config/database.example.yml:/app/config/database.yml
       - ./docker/env.example.yml:/app/config/env.yml
     ports:
       - '3030:3030'
+    expose:
+      - '3030'
+    # env_file:
+    #   - .env
     depends_on:
       - recruitable_db
 
